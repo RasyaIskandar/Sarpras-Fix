@@ -4,9 +4,14 @@
 
     <div class="p-4 sm:p-8 bg-gray-100 min-h-screen flex items-center justify-center">
         <div class="bg-white p-6 sm:p-8 rounded-xl shadow-lg w-full max-w-4xl">
-            <div class="flex justify-between text-center text-sm text-gray-400 mb-6 sm:mb-8">
-                <div class="text-blue-600 font-semibold">Form Laporan</div>
-            </div>
+            <div class="flex justify-between items-center mb-6">
+    <div class="text-blue-600 font-semibold">Form Laporan</div>
+    <a href="{{ route('laporan.index') }}"
+       class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg text-sm transition">
+        ← Back
+    </a>
+</div>
+
 
             @if ($errors->any())
                 <div class="mb-6 bg-red-100 border border-red-400 text-red-700 rounded-lg p-4 text-sm">
@@ -17,6 +22,8 @@
                     </ul>
                 </div>
             @endif
+
+            
 
            <form action="{{ route('laporan.store') }}" method="POST" enctype="multipart/form-data">
     @csrf

@@ -89,13 +89,14 @@
                     </div>
                 @endif
 
-                <div class="flex justify-end pt-4">
-                    <a href="{{ route('laporan.index') }}"
-                        class="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-blue-600 transition flex items-center space-x-2">
-                        <span>Close</span>
-                        <i class="fa-solid fa-xmark w-4 h-4 text-white"></i>
-                    </a>
-                </div>
+               <div class="flex justify-end pt-4">
+    <a href="{{ Auth::check() && Auth::user()->role === 'admin' ? route('dashboard') : route('laporan.index') }}"
+       class="bg-blue-500 text-white px-6 py-2 rounded-lg font-medium shadow-sm hover:bg-blue-600 transition flex items-center space-x-2">
+        <span>Close</span>
+        <i class="fa-solid fa-xmark w-4 h-4 text-white"></i>
+    </a>
+</div>
+
             </div>
         </div>
     </div>

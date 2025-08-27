@@ -31,10 +31,10 @@
 
                     <!-- Username -->
                     <div>
-                        <label for="email" class="block text-sm mb-1">Username</label>
+                        <label for="email" class="block text-sm mb-1">Email</label>
                         <input id="email" type="email" name="email"
                             class="w-full px-4 py-3 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-300"
-                            placeholder="Enter your username" value="{{ old('email') }}" required autofocus>
+                            placeholder="Enter your Email" value="{{ old('email') }}" required autofocus>
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
 

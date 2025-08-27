@@ -58,18 +58,21 @@
                placeholder="Cari Judul.."
                class="border border-gray-300 rounded-lg px-3 py-1 bg-white w-full sm:w-48">
 
-        <!-- Date Filters -->
-        <input type="date" name="start_date" value="{{ request('start_date') }}"
-               class="border border-gray-300 rounded-lg px-3 py-1 bg-white w-full sm:w-auto">
-        <span class="hidden sm:inline">s/d</span>
-        <input type="date" name="end_date" value="{{ request('end_date') }}"
-               class="border border-gray-300 rounded-lg px-3 py-1 bg-white w-full sm:w-auto">
+        <!-- Date Filters (desktop only) -->
+<div class="hidden sm:flex items-center gap-2">
+    <input type="date" name="start_date" value="{{ request('start_date') }}"
+           class="border border-gray-300 rounded-lg px-3 py-1 bg-white w-auto focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <span class="text-gray-500">s/d</span>
+    <input type="date" name="end_date" value="{{ request('end_date') }}"
+           class="border border-gray-300 rounded-lg px-3 py-1 bg-white w-auto focus:outline-none focus:ring-2 focus:ring-blue-500">
+</div>
+
 
         <div class="flex gap-2 mt-2 sm:mt-0">
             <button type="submit"
                     class="px-3 py-1 bg-blue-500 text-white rounded-lg">Filter</button>
             <a href="{{ route('laporan.index') }}"
-               class="px-3 py-1 bg-gray-400 text-white rounded-lg">Reset</a>
+               class="px-3 py-1 bg-gray-400 text-white rounded-lg">Reload</a>
         </div>
     </form>
 </div>
