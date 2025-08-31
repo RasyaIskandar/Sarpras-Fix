@@ -7,7 +7,7 @@
   body {
     font-family: Arial, sans-serif;
     font-size: 12px;
-    margin: 20px;
+    margin: 20px 20px 120px 20px; /* Tambah margin-bottom untuk footer resmi */
   }
   h2 {
     text-align: center;
@@ -17,20 +17,25 @@
   table {
     width: 100%;
     border-collapse: collapse;
-    table-layout: fixed; /* Supaya wrap bekerja */
+    table-layout: auto; /* biar kolom menyesuaikan isi */
   }
   th, td {
     border: 1px solid #ddd;
     padding: 8px;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    word-wrap: break-word;
     white-space: normal;
   }
   th {
     background-color: #2c3e50;
     color: white;
     text-align: center;
+    white-space: nowrap; /* cegah header pecah ke bawah */
   }
+
+  /* Atur lebar kolom */
+  th:nth-child(8), td:nth-child(8) { width: 12%; } /* Tanggal Laporan */
+  th:nth-child(9), td:nth-child(9) { width: 12%; } /* Tanggal Selesai */
+
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
@@ -52,37 +57,74 @@
   th:nth-child(6), td:nth-child(6) { width: 20%; } /* Deskripsi Tindakan */
   th:nth-child(7), td:nth-child(7) { width: 10%; }
   th:nth-child(8), td:nth-child(8) { width: 10%; }
+
+  /* CSS untuk footer resmi */
+  .footer {
+    position: fixed;
+    bottom: 20px; /* Jarak dari bawah halaman */
+    right: 20px; /* Jarak dari kanan */
+    width: 100%;
+    text-align: right;
+    font-size: 11px; /* Ukuran font sedikit lebih kecil */
+    line-height: 1.5; /* Jarak antar baris */
+    page-break-after: avoid; /* Hindari break di footer */
+  }
+  .footer .signature-space {
+    height: 80px; /* Ruang kosong untuk tanda tangan dan cap */
+    margin: 10px 0; /* Jarak atas-bawah */
+  }
 </style>
 </head>
 <body>
-<h2>Data Laporan Kerusakan Sarpras</h2>
-<table>
-  <thead>
-    <tr>
-      <th>No</th>
-      <th>Judul</th>
-      <th>Deskripsi</th>
-      <th>Status</th>
-      <th>Lokasi</th>
-      <th>Deskripsi Tindakan</th>
-      <th>User</th>
-      <th>Tanggal</th>
-    </tr>
-  </thead>
-  <tbody>
-    @foreach($laporans as $laporan)
-    <tr>
-      <td class="center">{{ $loop->iteration }}</td>
-      <td>{{ $laporan->judul }}</td>
-      <td>{{ $laporan->deskripsi }}</td>
-      <td class="center">{{ ucfirst($laporan->status) }}</td>
-      <td>{{ $laporan->lokasi ?? '-' }}</td>
-      <td>{{ $laporan->deskripsi_tindakan ?? '-' }}</td>
-      <td>{{ $laporan->user->name ?? '-' }}</td>
-      <td class="center">{{ $laporan->created_at->format('d-m-Y') }}</td>
-    </tr>
-    @endforeach
-  </tbody>
-</table>
+  <h2>Data Laporan Kerusakan Sarpras</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Laporan</th>
+        <th>Deskripsi</th>
+        <th>Status</th>
+        <th>Lokasi</th>
+        <th>Deskripsi Tindakan</th>
+        <th>User</th>
+        <th>Tanggal Laporan Dibuat</th>
+        <th>Tanggal Selesai</th>
+      </tr>
+    </thead>
+    <tbody>
+      @foreach($laporans as $laporan)
+      <tr>
+        <td class="center">{{ $loop->iteration }}</td>
+        <td>{{ $laporan->judul }}</td>
+        <td>{{ $laporan->deskripsi }}</td>
+        <td class="center">{{ ucfirst($laporan->status) }}</td>
+        <td>{{ $laporan->lokasi ?? '-' }}</td>
+        <td>{{ $laporan->deskripsi_tindakan ?? '-' }}</td>
+        <td>{{ $laporan->user->name ?? '-' }}</td>
+        <td class="center">{{ $laporan->created_at->format('d-m-Y') }}</td>
+        <td class="center">
+          @if($laporan->status === 'selesai' && $laporan->updated_at)
+            {{ $laporan->updated_at->format('d-m-Y') }}
+          @else
+            -
+          @endif
+        </td>
+      </tr>
+      @endforeach
+    </tbody>
+  </table>
+
+  <!-- Footer dengan format surat resmi -->
+  <div class="footer">
+      <p>{{ $startDate }}</p>
+      <p>{{ $endDate }}</p>
+      <p>Bogor, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+        <p>Petugas Pelaksana</p>
+
+        <br><br><br> <!-- ruang untuk tanda tangan & stempel -->
+
+        <p>{{ $admin ?? '' }}</p>
+  </div>
 </body>
 </html>

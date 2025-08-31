@@ -89,14 +89,29 @@
                         </a>
                     </div>
 
-                     {{-- Tombol Export PDF khusus admin --}}
-                @if(Auth::user()->role === 'admin')
-                    <a href="{{ route('laporan.exportPdf') }}"
-                       class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
-                        <i class="fa-solid fa-file-pdf"></i>
-                        <span>PDF</span>
-                    </a>
-                @endif
+                    {{-- Tombol Export PDF khusus admin --}}
+                    @if(Auth::user()->role === 'admin')
+                        {{-- Export laporan pekan ini --}}
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'weekly']) }}"
+                        class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Export PDF (Pekan Ini)</span>
+                        </a>
+
+                        {{-- Export laporan pekan ini --}}
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'custom', 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
+                        class="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Export PDF (Tanggal Tertentu)</span>
+                        </a>
+
+                        {{-- Export semua laporan --}}
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'all']) }}"
+                        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
+                            <i class="fa-solid fa-file-pdf"></i>
+                            <span>Export PDF (Semua)</span>
+                        </a>
+                    @endif
                 </form>
             </div>
 

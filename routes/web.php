@@ -35,10 +35,9 @@ Route::get('/chart-data', [LaporanController::class, 'chartData'])->name('chart.
 Route::get('send-mail', [EmailsController::class, 'welcomeMail']);
 
 Route::middleware(['auth', 'admin'])->group(function () {
-    Route::get('/admin/laporan/export-pdf', [App\Http\Controllers\Admin\LaporanController::class, 'exportPdf'])
+    Route::get('/admin/laporan/export-pdf/{mode?}', [AdminLaporanController::class, 'exportPdf'])
         ->name('laporan.exportPdf');
 });
-
 
 
 require __DIR__.'/auth.php';

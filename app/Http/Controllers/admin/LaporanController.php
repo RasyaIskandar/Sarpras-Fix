@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Laporan;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class LaporanController extends Controller
 {
@@ -83,14 +85,37 @@ public function destroy(Laporan $laporan)
     return redirect()->route('dashboard')->with('success', 'Laporan berhasil dihapus.');
 }
 
-public function exportPdf()
-    {
+public function exportPdf($mode = 'all')
+{
+    Carbon::setLocale('id');
+
+    if ($mode === 'weekly') {
+        $laporans = Laporan::with('user')
+            ->whereBetween('created_at', [
+                Carbon::now()->startOfWeek(),
+                Carbon::now()->endOfWeek()
+            ])
+            ->get();
+    } elseif ($mode === 'custom') {
+        $startDate = Carbon::parse(request()->start_date)->startOfDay();
+        $endDate = Carbon::parse(request()->end_date)->endOfDay();
+
+        $laporans = Laporan::with('user')
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+    } else {
         $laporans = Laporan::with('user')->get();
-
-        $pdf = Pdf::loadView('laporan.pdf', compact('laporans'))
-            ->setPaper('a4', 'landscape');
-
-        return $pdf->download('laporan.pdf');
     }
+
+    $pdf = Pdf::loadView('laporan.pdf', [
+        'laporans' => $laporans,
+        'startDate' => $startDate ?? null,
+        'endDate' => $endDate ?? null,
+        'admin' => auth()->user()->name ?? 'Admin',
+        'tanggal_cetak' => now()->format('d-m-Y H:i'),
+    ])->setPaper('a4', 'landscape');
+
+    return $pdf->download("laporan-{$mode}.pdf");
+}
 
 }
