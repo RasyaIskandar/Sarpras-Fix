@@ -117,14 +117,12 @@
 
   <!-- Footer dengan format surat resmi -->
   <div class="footer">
-      <p>{{ $startDate }}</p>
-      <p>{{ $endDate }}</p>
-      <p>Bogor, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
-        <p>Petugas Pelaksana</p>
+    <p>Bogor, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+    <p>Petugas Pelaksana</p>
 
-        <br><br><br> <!-- ruang untuk tanda tangan & stempel -->
+    <br><br><br> <!-- ruang untuk tanda tangan & stempel -->
 
-        <p>{{ $admin ?? '' }}</p>
+    <p>{{ $admin ?? '' }}</p>
   </div>
 </body>
 </html>
