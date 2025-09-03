@@ -92,21 +92,21 @@
                     {{-- Tombol Export PDF khusus admin --}}
                     @if(Auth::user()->role === 'admin')
                         {{-- Export laporan pekan ini --}}
-                        <a href="{{ route('laporan.exportPdf', ['mode' => 'weekly']) }}"
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'weekly']) }}" target="_blank"
                         class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg shadow hover:bg-green-700 transition">
                             <i class="fa-solid fa-file-pdf"></i>
                             <span>Export PDF (Pekan Ini)</span>
                         </a>
 
                         {{-- Export laporan pekan ini --}}
-                        <a href="{{ route('laporan.exportPdf', ['mode' => 'custom', 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}"
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'custom', 'start_date' => request('start_date'), 'end_date' => request('end_date')]) }}" target="_blank"
                         class="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg shadow hover:bg-yellow-700 transition">
                             <i class="fa-solid fa-file-pdf"></i>
                             <span>Export PDF (Tanggal Tertentu)</span>
                         </a>
 
                         {{-- Export semua laporan --}}
-                        <a href="{{ route('laporan.exportPdf', ['mode' => 'all']) }}"
+                        <a href="{{ route('laporan.exportPdf', ['mode' => 'all']) }}" target="_blank"
                         class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">
                             <i class="fa-solid fa-file-pdf"></i>
                             <span>Export PDF (Semua)</span>
@@ -134,7 +134,7 @@
                         <tbody class="divide-y divide-gray-200">
                             @forelse($laporans as $laporan)
                             <tr class="hover:bg-gray-50 transition-colors">
-                                  <td class="px-6 py-4 font-medium">{{ $loop->iteration }}</td> {{-- Nomor urut otomatis --}}
+                                <td class="px-6 py-4 font-medium">{{ $loop->iteration }}</td> {{-- Nomor urut otomatis --}}
                                 <td class="px-6 py-4 font-medium">{{ $laporan->judul }}</td>
                                 <td class="px-6 py-4">
                                     <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide
