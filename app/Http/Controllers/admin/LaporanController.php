@@ -111,7 +111,7 @@ public function exportPdf($mode = 'all')
         'laporans' => $laporans,
         'startDate' => $startDate ?? null,
         'endDate' => $endDate ?? null,
-        'admin' => auth()->user()->name ?? 'Admin',
+        'admin' => Auth::user()->name ?? 'Admin',
         'tanggal_cetak' => now()->format('d-m-Y H:i'),
     ])->setPaper('a4', 'landscape');
 
