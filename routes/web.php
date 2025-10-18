@@ -7,11 +7,18 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
+
+
+// Redirect to login with a message after email verification
+Route::get('/email/verified', function () {
+    return redirect()->route('login')->with('status', 'Email berhasil diverifikasi. Silakan login.');
+})->name('verification.redirect');
+
 Route::get('/', function () {
     return view('welcome');
 });
 
-Route::middleware(['auth','admin'])->group(function() {
+Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminLaporanController::class, 'index'])->name('dashboard');
     Route::patch('/laporan/{id}/update-status', [AdminLaporanController::class, 'updateStatus'])->name('laporan.updateStatus');
 });
@@ -40,4 +47,4 @@ Route::middleware(['auth', 'admin'])->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

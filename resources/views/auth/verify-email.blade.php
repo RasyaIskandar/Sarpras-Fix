@@ -3,7 +3,8 @@
         <div class="w-full max-w-md bg-white p-6 sm:p-8 rounded-xl shadow-md text-center">
             <h2 class="text-lg font-semibold text-gray-800 mb-4">Verifikasi Email</h2>
             <p class="text-sm text-gray-600 mb-6">
-                Terima kasih telah mendaftar! Sebelum memulai, silakan verifikasi alamat email Anda dengan mengklik tautan yang telah kami kirim. Jika tidak menerima email, kami akan mengirimkan yang baru.
+                Terima kasih telah mendaftar! Sebelum memulai, silakan verifikasi alamat email Anda dengan mengklik
+                tautan yang telah kami kirim. Jika tidak menerima email, kami akan mengirimkan yang baru.
             </p>
 
             @if (session('status') == 'verification-link-sent')

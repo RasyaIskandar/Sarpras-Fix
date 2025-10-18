@@ -24,35 +24,35 @@ class AuthenticatedSessionController extends Controller
      * Handle an incoming authentication request.
      */
     public function store(Request $request): RedirectResponse
-{
-    $request->validate([
-        'email' => 'required|string|email',
-        'password' => 'required|string',
-    ]);
-
-    if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-        throw ValidationException::withMessages([
-            'email' => __('auth.failed'),
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string',
         ]);
+
+        if (! Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
+            throw ValidationException::withMessages([
+                'email' => __('auth.failed'),
+            ]);
+        }
+
+        $request->session()->regenerate();
+
+        // Cek role
+        if (Auth::user()->role === 'admin') {
+            return redirect()->intended(route('dashboard', absolute: false));
+        }
+
+        // Kalau user belum verified
+        if (! Auth::user()->email_verified_at) {
+            Auth::logout();
+            return redirect()->route('verification.notice')
+                ->with('status', 'Silakan verifikasi email terlebih dahulu.');
+        }
+
+        // Kalau verified → ke laporan.index
+        return redirect()->intended(route('laporan.index', absolute: false));
     }
-
-    $request->session()->regenerate();
-
-    // Cek role
-    if (Auth::user()->role === 'admin') {
-        return redirect()->intended(route('dashboard', absolute: false));
-    }
-
-    // Kalau user belum verified
-   if (! Auth::user()->email_verified_at) {
-    Auth::logout();
-    return redirect()->route('verification.notice')
-        ->with('status', 'Silakan verifikasi email terlebih dahulu.');
-}
-
-    // Kalau verified → ke laporan.index
-    return redirect()->intended(route('laporan.index', absolute: false));
-}
 
 
     /**
