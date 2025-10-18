@@ -219,79 +219,252 @@
                     </table>
                 </div>
             </div>
+
+            {{-- Modal Admin Tambah Admin --}}
+            @if(Auth::user()->role === 'admin')
+            <div class="bg-white shadow-lg rounded-2xl border border-gray-200 max-w-5xl mx-auto my-8 p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">Manajemen Admin</h3>
+                    <button onclick="openAddAdminModal()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+                        Tambah Admin
+                    </button>
+                </div>
+
+                <table class="w-full text-sm text-gray-700">
+                    <thead class="bg-gray-200 text-gray-700 uppercase text-xs font-semibold">
+                        <tr>
+                            <th class="px-6 py-3 text-left">Nama</th>
+                            <th class="px-6 py-3 text-left">Email</th>
+                            <th class="px-6 py-3 text-right">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach(\App\Models\User::where('role', 'admin')->get() as $admin)
+                        <tr class="border-t">
+                            <td class="px-6 py-3">{{ $admin->name }}</td>
+                            <td class="px-6 py-3">{{ $admin->email }}</td>
+                            <td class="px-6 py-3 text-right">
+                                <button onclick="openEditAdminModal({{ $admin->id }}, '{{ $admin->name }}', '{{ $admin->email }}')" class="text-blue-600 hover:underline mr-2">Edit</button>
+                                @if($admin->id !== Auth::id())
+                                    <button 
+                                        type="button"
+                                        class="text-red-600 hover:underline"
+                                        onclick="confirmDelete({{ $admin->id }})">
+                                        Hapus
+                                    </button>
+
+                                    <form id="deleteForm-{{ $admin->id }}" 
+                                        action="{{ route('admin.users.destroy', $admin->id) }}" 
+                                        method="POST" 
+                                        class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Modal Tambah Admin -->
+            <div id="addAdminModal" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-xl w-96 shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Tambah Admin Baru</h3>
+                    <form method="POST" action="{{ route('admin.users.store') }}">
+                        @csrf
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Nama</label>
+                            <input type="text" name="name" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Password</label>
+                            <input type="password" name="password" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Konfirmasi Password</label>
+                            <input type="password" name="password_confirmation" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="flex justify-end gap-2 mt-4">
+                            <button type="button" onclick="closeAddAdminModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal Edit Admin -->
+            <div id="editAdminModal" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
+                <div class="bg-white p-6 rounded-xl w-96 shadow-lg">
+                    <h3 class="text-lg font-semibold mb-4">Edit Data Admin</h3>
+                    <form method="POST" id="editAdminForm">
+                        @csrf @method('PATCH')
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Nama</label>
+                            <input type="text" name="name" id="editName" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="mb-3">
+                            <label class="block text-sm font-medium text-gray-700">Email</label>
+                            <input type="email" name="email" id="editEmail" class="border rounded-lg w-full px-3 py-2">
+                        </div>
+                        <div class="flex justify-end gap-2 mt-4">
+                            <button type="button" onclick="closeEditAdminModal()" class="px-4 py-2 bg-gray-300 rounded-lg">Batal</button>
+                            <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-lg">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            @endif
         </main>
     </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-    function openDeleteModal(id) {
-        document.getElementById('delete-modal-' + id).classList.remove('hidden');
-    }
-    function closeDeleteModal(id) {
-        document.getElementById('delete-modal-' + id).classList.add('hidden');
-    }
-    function openModal(id) {
-        let modal = document.getElementById(`modal-${id}`);
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        let textarea = modal.querySelector("textarea");
-        if (textarea) setTimeout(() => textarea.focus(), 200);
-    }
-    function closeModal(id) {
-        let modal = document.getElementById(`modal-${id}`);
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-    }
+/* ---------- SWEETALERT GLOBAL ---------- */
 
-    const dataTotal = [@foreach(range(1,12) as $m) {{ $laporans->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
-    const dataPending = [@foreach(range(1,12) as $m) {{ $laporans->where('status','pending')->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
-    const dataSelesai = [@foreach(range(1,12) as $m) {{ $laporans->where('status','selesai')->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
+// Loading state hanya untuk form tertentu (bukan semua)
+function showLoading() {
+    Swal.fire({
+        title: 'Memproses...',
+        html: 'Harap tunggu sebentar.',
+        didOpen: () => Swal.showLoading(),
+        allowOutsideClick: false,
+        showConfirmButton: false
+    });
+}
 
-    const ctx = document.getElementById('laporanChart').getContext('2d');
-    const laporanChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [@foreach(range(1,12) as $m) "{{ \Carbon\Carbon::create()->month($m)->format('M') }}", @endforeach],
-            datasets: [{
-                label: 'Total',
-                data: dataTotal,
-                borderColor: 'rgb(59, 130, 246)',
-                backgroundColor: 'rgba(59, 130, 246, 0.2)',
-                tension: 0.4,
-                fill: true,
-                pointBackgroundColor: 'rgb(37, 99, 235)',
-                pointRadius: 4,
-                pointHoverRadius: 6,
-            }]
-        },
-        options: {
-            maintainAspectRatio: false,
-            responsive: true,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { display: false }, ticks: { color: '#4B5563', font: { size: 10 } } },
-                y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, ticks: { color: '#4B5563', font: { size: 10 }, precision: 0 } }
-            }
+/* ---------- KONFIRMASI HAPUS ADMIN ---------- */
+function confirmDelete(id) {
+    Swal.fire({
+        title: 'Yakin hapus admin ini?',
+        text: 'Aksi ini tidak bisa dibatalkan.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#e3342f',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Ya, hapus',
+        cancelButtonText: 'Batal'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            showLoading();
+            document.getElementById('deleteForm-' + id).submit();
         }
     });
+}
 
-    document.getElementById('chartFilter').addEventListener('change', function () {
-        let selected = this.value;
-        let chartData, borderColor, backgroundColor, pointColor;
-        if (selected === "total") {
-            chartData = dataTotal; borderColor = "rgb(59, 130, 246)"; backgroundColor = "rgba(59, 130, 246, 0.2)"; pointColor = "rgb(37, 99, 235)";
-        } else if (selected === "pending") {
-            chartData = dataPending; borderColor = "rgb(250, 204, 21)"; backgroundColor = "rgba(250, 204, 21, 0.2)"; pointColor = "rgb(202, 138, 4)";
-        } else if (selected === "selesai") {
-            chartData = dataSelesai; borderColor = "rgb(34, 197, 94)"; backgroundColor = "rgba(34, 197, 94, 0.2)"; pointColor = "rgb(21, 128, 61)";
+/* ---------- ALERT SESSION ---------- */
+@if (session('success'))
+Swal.fire({
+    icon: 'success',
+    title: 'Berhasil!',
+    text: '{{ session('success') }}',
+    timer: 2000,
+    showConfirmButton: false
+});
+@endif
+
+@if (session('error'))
+Swal.fire({
+    icon: 'error',
+    title: 'Gagal!',
+    text: '{{ session('error') }}',
+});
+@endif
+
+/* ---------- MODAL FUNCS ---------- */
+function openDeleteModal(id) {
+    document.getElementById('delete-modal-' + id).classList.remove('hidden');
+}
+function closeDeleteModal(id) {
+    document.getElementById('delete-modal-' + id).classList.add('hidden');
+}
+function openModal(id) {
+    let modal = document.getElementById(`modal-${id}`);
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
+    let textarea = modal.querySelector("textarea");
+    if (textarea) setTimeout(() => textarea.focus(), 200);
+}
+function closeModal(id) {
+    let modal = document.getElementById(`modal-${id}`);
+    modal.classList.add("hidden");
+    modal.classList.remove("flex");
+}
+function openAddAdminModal() {
+    document.getElementById('addAdminModal').classList.remove('hidden');
+    document.getElementById('addAdminModal').classList.add('flex');
+}
+function closeAddAdminModal() {
+    document.getElementById('addAdminModal').classList.add('hidden');
+}
+function openEditAdminModal(id, name, email) {
+    document.getElementById('editAdminForm').action = `/admin/users/${id}`;
+    document.getElementById('editName').value = name;
+    document.getElementById('editEmail').value = email;
+    document.getElementById('editAdminModal').classList.remove('hidden');
+    document.getElementById('editAdminModal').classList.add('flex');
+}
+function closeEditAdminModal() {
+    document.getElementById('editAdminModal').classList.add('hidden');
+}
+
+/* ---------- CHART.JS ---------- */
+const dataTotal = [@foreach(range(1,12) as $m) {{ $laporans->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
+const dataPending = [@foreach(range(1,12) as $m) {{ $laporans->where('status','pending')->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
+const dataSelesai = [@foreach(range(1,12) as $m) {{ $laporans->where('status','selesai')->whereBetween('created_at', [now()->startOfYear()->month($m)->startOfMonth(), now()->startOfYear()->month($m)->endOfMonth()])->count() }}, @endforeach];
+
+const ctx = document.getElementById('laporanChart').getContext('2d');
+const laporanChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [@foreach(range(1,12) as $m) "{{ \Carbon\Carbon::create()->month($m)->format('M') }}", @endforeach],
+        datasets: [{
+            label: 'Total',
+            data: dataTotal,
+            borderColor: 'rgb(59, 130, 246)',
+            backgroundColor: 'rgba(59, 130, 246, 0.2)',
+            tension: 0.4,
+            fill: true,
+            pointBackgroundColor: 'rgb(37, 99, 235)',
+            pointRadius: 4,
+            pointHoverRadius: 6,
+        }]
+    },
+    options: {
+        maintainAspectRatio: false,
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { color: '#4B5563', font: { size: 10 } } },
+            y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.1)' }, ticks: { color: '#4B5563', font: { size: 10 }, precision: 0 } }
         }
-        laporanChart.data.datasets[0].data = chartData;
-        laporanChart.data.datasets[0].label = selected.charAt(0).toUpperCase() + selected.slice(1);
-        laporanChart.data.datasets[0].borderColor = borderColor;
-        laporanChart.data.datasets[0].backgroundColor = backgroundColor;
-        laporanChart.data.datasets[0].pointBackgroundColor = pointColor;
-        laporanChart.update();
-    });
+    }
+});
+
+document.getElementById('chartFilter').addEventListener('change', function () {
+    let selected = this.value;
+    let chartData, borderColor, backgroundColor, pointColor;
+    if (selected === "total") {
+        chartData = dataTotal; borderColor = "rgb(59, 130, 246)"; backgroundColor = "rgba(59, 130, 246, 0.2)"; pointColor = "rgb(37, 99, 235)";
+    } else if (selected === "pending") {
+        chartData = dataPending; borderColor = "rgb(250, 204, 21)"; backgroundColor = "rgba(250, 204, 21, 0.2)"; pointColor = "rgb(202, 138, 4)";
+    } else if (selected === "selesai") {
+        chartData = dataSelesai; borderColor = "rgb(34, 197, 94)"; backgroundColor = "rgba(34, 197, 94, 0.2)"; pointColor = "rgb(21, 128, 61)";
+    }
+    laporanChart.data.datasets[0].data = chartData;
+    laporanChart.data.datasets[0].label = selected.charAt(0).toUpperCase() + selected.slice(1);
+    laporanChart.data.datasets[0].borderColor = borderColor;
+    laporanChart.data.datasets[0].backgroundColor = backgroundColor;
+    laporanChart.data.datasets[0].pointBackgroundColor = pointColor;
+    laporanChart.update();
+});
 </script>
 </x-app-layout>

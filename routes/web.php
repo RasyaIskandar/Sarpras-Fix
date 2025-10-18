@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\admin\AdminUserController;
 use App\Http\Controllers\Admin\LaporanController as AdminLaporanController;
 use App\Http\Controllers\EmailsController;
 use App\Http\Controllers\LaporanController;
@@ -22,6 +23,11 @@ Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/dashboard', [AdminLaporanController::class, 'index'])->name('dashboard');
     Route::patch('/laporan/{id}/update-status', [AdminLaporanController::class, 'updateStatus'])->name('laporan.updateStatus');
 });
+
+Route::get('/admin/users', [AdminUserController::class, 'index'])->name('admin.users.index');
+Route::post('/admin/users', [AdminUserController::class, 'store'])->name('admin.users.store');
+Route::patch('/admin/users/{id}', [AdminUserController::class, 'update'])->name('admin.users.update');
+Route::delete('/admin/users/{id}', [AdminUserController::class, 'destroy'])->name('admin.users.destroy');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
